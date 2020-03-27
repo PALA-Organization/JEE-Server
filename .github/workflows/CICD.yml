@@ -3,7 +3,13 @@
 
 name: CI/CD
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+    - '.github/**'
+  pull_request:
+    paths-ignore:
+    - '.github/**'
 
 jobs:
   test:
