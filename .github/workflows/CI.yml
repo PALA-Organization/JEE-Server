@@ -6,12 +6,9 @@ name: Java CI with Maven
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    
     - name: Checkout repository access
       uses: actions/checkout@v2 # Check if the workflow can access our repo
     
@@ -19,9 +16,6 @@ jobs:
       uses: actions/setup-java@v1 # Sets up a Java environment
       with:
         java-version: 11
-        
-    - name: Build project
-      run: mvn -B package --file pom.xml
-    
+       
     - name: Run tests
       run: mvn test
