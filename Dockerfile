@@ -1,2 +1,4 @@
-FROM tomcat
-COPY /target/server-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/jee-server.jar
+FROM openjdk:11
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java", "-jar", "/jee-server.jar"]
