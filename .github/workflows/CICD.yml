@@ -41,7 +41,7 @@ jobs:
     - name: Deploy with Maven
       run: nohup mvn spring-boot:run &
 
-   deploy-dev:
+  deploy-dev:
     if: github.ref == 'develop' && github.event_name == 'push'
     needs: build
     runs-on: self-hosted
