@@ -1,5 +1,6 @@
-package fr.pala.compta.server;
+package fr.pala.accounting.server;
 
+import fr.pala.accounting.controller.HomeController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ServerApplication.class, args);
+        SpringApplication.run(HomeController.class, args);
     }
 
 }
