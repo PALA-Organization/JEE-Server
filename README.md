@@ -1,5 +1,27 @@
 # JEE-Server : Gestion de comptes
 
+## Lancement
+
+Pour lancer le serveur avec Maven :
+
+```console
+$ mvn spring-boot:run
+```
+
+Pour lancer le serveur avec Java :
+
+```console
+$ mvn package
+$ java -jar target/server-version.jar
+```
+
+Pour lancer le serveur avec Docker :
+
+```console
+$ docker build . --tag jee-server
+$ docker run -d -p 8080:8080 --name="jee-server" jee-server
+```
+
 ## Description
 Serveur JEE permettant de gérer ses dépenses et rentrées d’argent personnelles et de générer des statistiques.
 
