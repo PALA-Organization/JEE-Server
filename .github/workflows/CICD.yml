@@ -27,24 +27,22 @@ jobs:
       run: mvn test
 
   build:
+    if: (github.ref == 'master' || github.ref == 'develop') && github.event_name == 'push'
     needs: test
     runs-on: self-hosted
     steps:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
      
-  deploy-master:
-    if: github.ref == 'master' && github.event_name == 'push'
+  deploy:
     needs: build
     runs-on: self-hosted
     steps:
-    - name: Deploy with Maven
-      run: nohup mvn spring-boot:run &
+    - name: Stop previous Docker image
+      run: docker rm jee-server || echo "Server already stopped"
 
-  deploy-dev:
-    if: github.ref == 'develop' && github.event_name == 'push'
-    needs: build
-    runs-on: self-hosted
-    steps:
-    - name: Deploy with Maven
-      run: nohup mvn spring-boot:run &
+    - name: Build new Docker image
+      run: docker build . --tag jee-server
+      
+    - name: Launch new Docker image
+      run: docker run -d -p 8080:8080 --name "jee-server" jee-server
