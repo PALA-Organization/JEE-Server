@@ -1,4 +1,4 @@
-package fr.pala.accounting.models;
+package fr.pala.accounting.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +15,6 @@ public class AccountModel {
     @Id
     private String account_id;
     private Float amount;
-    private ArrayList<TransactionModel> transactions;
+    private ArrayList<String> transactions_ids;
 
 }
