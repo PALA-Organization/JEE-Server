@@ -33,16 +33,50 @@ jobs:
     steps:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-     
-  deploy:
+
+    - name: Build Docker image
+      run: docker build . --tag jee-serve  
+
+  publish-dev-image:
+    if: github.ref == 'develop'
     needs: build
     runs-on: self-hosted
     steps:
+    - name: Log-in on Docker repository
+      run: /home/debian/docker/docker-login.sh
+
+    - name: Tag of the new image
+      run: docker tag jee-server alexandrebis/main/jee-server:lastversion-dev
+
+    - name: Push of the new image
+      run: docker push alexandrebis/main/jee-server:lastversion-dev
+
+  deploy-dev:
+    if: github.ref == 'develop'
+    needs: build
+    runs-on: self-hosted
     - name: Stop previous Docker image
       run: docker rm jee-server || echo "Server already stopped"
-
-    - name: Build new Docker image
-      run: docker build . --tag jee-server
-      
+ 
     - name: Launch new Docker image
       run: docker run -d -p 8080:8080 --name "jee-server" jee-server
+
+  publish-prod-image:
+    if: github.ref == 'master'
+    needs: build
+    runs-on: self-hosted
+    - name: Log-in on Docker repository
+      run: /home/debian/docker/docker-login.sh
+
+    - name: Tag of the new image
+      run: docker tag jee-server alexandrebis/main/jee-server:lastversion-prod
+
+    - name: Push of the new image
+      run: docker push alexandrebis/main/jee-server:lastversion-prod
+
+  deploy-prod:
+    if: github.ref == 'master'
+    needs: [build, publish-prod-image]
+    runs-on: self-hosted
+    steps: 
+    - name: 
