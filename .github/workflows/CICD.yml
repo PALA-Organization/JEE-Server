@@ -79,4 +79,5 @@ jobs:
     needs: [build, publish-prod-image]
     runs-on: self-hosted
     steps: 
-    - name: 
+    - name: TODO
+      run: echo "TODO: Deploy the image to Beanstalk"
