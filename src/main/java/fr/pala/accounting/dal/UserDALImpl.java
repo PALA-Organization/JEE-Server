@@ -16,10 +16,15 @@ public class UserDALImpl implements UserDAL {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+
+    @Autowired
+    public UserDALImpl(){
+
+    }
+
     @Override
     public UserModel addUser(UserModel user) {
-        mongoTemplate.save(user);
-        return user;
+        return mongoTemplate.save(user);
     }
 
     @Override
@@ -35,15 +40,15 @@ public class UserDALImpl implements UserDAL {
     }
 
     @Override
-    public UserModel updateUser(UserModel user) {
+    public void updateUser(UserModel user) {
         Query query = new Query();
         query.addCriteria(Criteria.where("user_id").is(user.getUser_id()));
         Update update = new Update();
         update.set("name", user.getName());
         update.set("email", user.getEmail());
         update.set("last_connection", user.getLast_connection());
-        mongoTemplate.findAndModify(query, update, UserModel.class);
 
-        return user;
+
+        mongoTemplate.findAndModify(query, update, UserModel.class);
     }
 }

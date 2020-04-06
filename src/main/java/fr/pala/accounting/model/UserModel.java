@@ -20,4 +20,13 @@ public class UserModel {
     private Date created;
     private Date last_connection;
     private ArrayList<AccountModel> accounts;
+
+    public UserModel(String user_id, String name, String email, Date created, Date last_connection, ArrayList<AccountModel> accounts){
+        this.user_id = user_id;
+        this.name = name;
+        this.email = email;
+        this.created = created;
+        this.last_connection = last_connection;
+        this.accounts = accounts;
+    }
 }

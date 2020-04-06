@@ -2,11 +2,12 @@ package fr.pala.accounting.dal;
 
 import fr.pala.accounting.model.AccountModel;
 import fr.pala.accounting.model.TransactionModel;
-import fr.pala.accounting.model.UserModel;
 import fr.pala.accounting.server.ServerApplication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -19,11 +20,17 @@ import java.util.List;
 @Service
 public class TransactionDALImpl implements TransactionDAL {
 
+
     @Autowired
     private MongoTemplate mongoTemplate;
-    ConfigurableApplicationContext context = SpringApplication.run(ServerApplication.class);
-    private AccountDALImpl accountDALImpl = context.getBean(AccountDALImpl.class);
-    private UserDALImpl userDALImpl = context.getBean(UserDALImpl.class);
+
+    @Autowired
+    private AccountDALImpl accountDALImpl;
+
+    @Autowired
+    public TransactionDALImpl(){
+
+    }
 
     @Override
     public List<TransactionModel> getAllTransactionsOfAccount(String user_id, String account_id) {

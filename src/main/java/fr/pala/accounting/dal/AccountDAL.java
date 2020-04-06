@@ -14,7 +14,7 @@ public interface AccountDAL {
 
     AccountModel getAccountOfUser(String user_id, String account_id);
 
-    Float getAmountOfAccount(String user_id,String account_id);
+    Double getAmountOfAccount(String user_id,String account_id);
 
     void updateAccount(String user_id, String account_id, AccountModel account);
 

@@ -21,4 +21,15 @@ public class TransactionModel {
     private Float amount;
     private String description;
 
+    public TransactionModel(String transaction_id, String type, String shop_name, String shop_address, Date date, Float amount, String description){
+        this.transaction_id = transaction_id;
+        this.type = type;
+        this.shop_name = shop_name;
+        this.shop_address = shop_address;
+        this.date = date;
+        this.amount = amount;
+        this.description = description;
+
+    }
+
 }

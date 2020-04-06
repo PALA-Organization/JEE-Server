@@ -1,7 +1,6 @@
 package fr.pala.accounting.dal;
 
 import fr.pala.accounting.model.AccountModel;
-import fr.pala.accounting.model.TransactionModel;
 import fr.pala.accounting.model.UserModel;
 import fr.pala.accounting.server.ServerApplication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +20,14 @@ public class AccountDALImpl implements AccountDAL {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-    ConfigurableApplicationContext context = SpringApplication.run(ServerApplication.class);
-    private UserDALImpl userDALImpl = context.getBean(UserDALImpl.class);
+
+    @Autowired
+    private UserDALImpl userDALImpl;
+
+    @Autowired
+    private AccountDALImpl() {
+    }
+
 
     @Override
     public AccountModel addAccount(String user_id, AccountModel accountModel) {
@@ -66,7 +71,7 @@ public class AccountDALImpl implements AccountDAL {
     }
 
     @Override
-    public Float getAmountOfAccount(String user_id, String account_id) {
+    public Double getAmountOfAccount(String user_id, String account_id) {
         AccountModel account = getAccountOfUser(user_id, account_id);
         return account.getAmount();
     }

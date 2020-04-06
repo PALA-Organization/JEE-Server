@@ -12,6 +12,6 @@ public interface UserDAL {
 
     UserModel getUserById(String user_id);
 
-    UserModel updateUser(UserModel user);
+    void updateUser(UserModel user);
 
 }
