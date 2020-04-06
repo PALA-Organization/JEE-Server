@@ -5,50 +5,54 @@ name: CI/CD
 on:
   push:
     paths-ignore:
-    - '.github/**'
+      - '.github/**'
   pull_request:
     paths-ignore:
-    - '.github/**'
+      - '.github/**'
 
 jobs:
   test:
     runs-on: self-hosted
     steps:
-    - name: Checkout repository access
-      uses: actions/checkout@v2 # Check if the workflow can access our repo
-    
-    - name: Set up Java 11 environment
-      uses: actions/setup-java@v1 # Sets up a Java environment
-      with:
-        java-version: 11
-       
-    - name: Test with Maven
-      run: mvn test
+      - name: Checkout repository access
+        uses: actions/checkout@v2 # Check if the workflow can access our repo
+
+      - name: Set up Java 11 environment
+        uses: actions/setup-java@v1 # Sets up a Java environment
+        with:
+          java-version: 11
+
+      - name: Test with Maven
+        run: mvn test
 
   build:
     if: (github.ref == 'master' || github.ref == 'develop') && github.event_name == 'push'
     needs: test
     runs-on: self-hosted
     steps:
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
 
-    - name: Build Docker image
-      run: docker build . --tag jee-serve  
+      - name: Build Docker image
+        run: docker build . --tag jee-serve  
 
   publish-dev-image:
     if: github.ref == 'develop'
     needs: build
     runs-on: self-hosted
     steps:
-    - name: Log-in on Docker repository
-      run: /home/debian/docker/docker-login.sh
+      - name: Log-in on Docker repository
+        env:
+          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
+          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}  
+        run: |
+          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
 
-    - name: Tag of the new image
-      run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-dev
+      - name: Tag of the new image
+        run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-dev
 
-    - name: Push of the new image
-      run: docker push alexandrebis/4al2-jee-project:lastversion-dev
+      - name: Push of the new image
+        run: docker push alexandrebis/4al2-jee-project:lastversion-dev
 
   deploy-dev:
     if: github.ref == 'develop'
@@ -66,19 +70,23 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-    - name: Log-in on Docker repository
-      run: /home/debian/docker/docker-login.sh
+      - name: Log-in on Docker repository
+        env:
+          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
+          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}
+        run: |
+          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
 
-    - name: Tag of the new image
-      run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-prod
+      - name: Tag of the new image
+        run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-prod
 
-    - name: Push of the new image
-      run: docker push alexandrebis/4al2-jee-project:lastversion-prod
+      - name: Push of the new image
+        run: docker push alexandrebis/4al2-jee-project:lastversion-prod
 
   deploy-prod:
     if: github.ref == 'master'
     needs: [build, publish-prod-image]
     runs-on: self-hosted
     steps: 
-    - name: TODO
-      run: echo "TODO Deploy the image to Beanstalk"
+      - name: TODO
+        run: echo "TODO Deploy the image to Beanstalk"
