@@ -1,5 +1,4 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# Workflow of JEE-Server
 
 name: CI/CD
 
@@ -33,16 +32,53 @@ jobs:
     steps:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-     
-  deploy:
+
+    - name: Build Docker image
+      run: docker build . --tag jee-serve  
+
+  publish-dev-image:
+    if: github.ref == 'develop'
     needs: build
     runs-on: self-hosted
     steps:
-    - name: Stop previous Docker image
-      run: docker rm jee-server || echo "Server already stopped"
+    - name: Log-in on Docker repository
+      run: /home/debian/docker/docker-login.sh
 
-    - name: Build new Docker image
-      run: docker build . --tag jee-server
-      
-    - name: Launch new Docker image
-      run: docker run -d -p 8080:8080 --name "jee-server" jee-server
+    - name: Tag of the new image
+      run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-dev
+
+    - name: Push of the new image
+      run: docker push alexandrebis/4al2-jee-project:lastversion-dev
+
+  deploy-dev:
+    if: github.ref == 'develop'
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Stop previous Docker image
+        run: docker rm jee-server || echo "Server already stopped"
+
+      - name: Launch new Docker image
+        run: docker run -d -p 8080:8080 --name "jee-server" jee-server
+
+  publish-prod-image:
+    if: github.ref == 'master'
+    needs: build
+    runs-on: self-hosted
+    steps:
+    - name: Log-in on Docker repository
+      run: /home/debian/docker/docker-login.sh
+
+    - name: Tag of the new image
+      run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-prod
+
+    - name: Push of the new image
+      run: docker push alexandrebis/4al2-jee-project:lastversion-prod
+
+  deploy-prod:
+    if: github.ref == 'master'
+    needs: [build, publish-prod-image]
+    runs-on: self-hosted
+    steps: 
+    - name: TODO
+      run: echo "TODO Deploy the image to Beanstalk"
