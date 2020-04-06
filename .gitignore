@@ -4,6 +4,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+src/main/resources/application.properties
 
 ### Generated files ###
 *.class
@@ -34,7 +35,7 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
-.mvn/timing.properties
+.mvn/
 .flattened-pom.xml
 
 ### IntelliJ IDEA ###
