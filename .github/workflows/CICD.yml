@@ -25,8 +25,8 @@ jobs:
       - name: Test with Maven
         run: mvn test
 
-  build:
-    if: (github.ref == 'master' || github.ref == 'develop') && github.event_name == 'push'
+  build-dev:
+    if: github.ref == 'develop' && github.event_name == 'push'
     needs: test
     runs-on: self-hosted
     steps:
@@ -34,11 +34,11 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Build Docker image
-        run: docker build . --tag jee-serve  
+        run: docker build . --tag jee-serve:dev
 
   publish-dev-image:
     if: github.ref == 'develop'
-    needs: build
+    needs: build-dev
     runs-on: self-hosted
     steps:
       - name: Log-in on Docker repository
@@ -49,14 +49,14 @@ jobs:
           docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
 
       - name: Tag of the new image
-        run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-dev
+        run: docker tag jee-server:dev alexandrebis/4al2-jee-project:lastversion-dev
 
       - name: Push of the new image
         run: docker push alexandrebis/4al2-jee-project:lastversion-dev
 
   deploy-dev:
     if: github.ref == 'develop'
-    needs: build
+    needs: build-dev
     runs-on: self-hosted
     steps:
       - name: Stop previous Docker image
@@ -65,9 +65,20 @@ jobs:
       - name: Launch new Docker image
         run: docker run -d -p 8080:8080 --name "jee-server" jee-server
 
+  build-prod:
+    if: github.ref == 'master' && github.event_name == 'push'
+    needs: test
+    runs-on: self-hosted
+    steps:
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Build Docker image
+        run: docker build . --tag jee-server:prod
+
   publish-prod-image:
     if: github.ref == 'master'
-    needs: build
+    needs: build-prod
     runs-on: self-hosted
     steps:
       - name: Log-in on Docker repository
@@ -78,14 +89,14 @@ jobs:
           docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
 
       - name: Tag of the new image
-        run: docker tag jee-server alexandrebis/4al2-jee-project:lastversion-prod
+        run: docker tag jee-server:prod alexandrebis/4al2-jee-project:lastversion-prod
 
       - name: Push of the new image
         run: docker push alexandrebis/4al2-jee-project:lastversion-prod
 
   deploy-prod:
     if: github.ref == 'master'
-    needs: [build, publish-prod-image]
+    needs: [build-prod, publish-prod-image]
     runs-on: self-hosted
     steps: 
       - name: TODO
