@@ -1,4 +1,12 @@
-FROM openjdk:11
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "/jee-server.jar"]
+FROM maven:3.6.3-jdk-11
+
+WORKDIR /jee-server
+
+COPY . .
+
+RUN mvn package
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "/jee-server/target/server-last.jar"]
+
