@@ -26,8 +26,8 @@ jobs:
         run: mvn test
 
   build-dev:
-    if: github.ref == 'develop' && github.event_name == 'push'
     needs: test
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: self-hosted
     steps:
       - name: Build with Maven
@@ -64,8 +64,8 @@ jobs:
         run: docker run -d -p 8080:8080 --name "jee-server" jee-server
 
   build-prod:
-    if: github.ref == 'master' && github.event_name == 'push'
     needs: test
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: self-hosted
     steps:
       - name: Build with Maven
