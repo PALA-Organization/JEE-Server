@@ -19,7 +19,9 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = TransactionDALImpl.class)
+@SpringBootTest(classes = { TransactionDALImpl.class, AccountDALImpl.class, UserDALImpl.class })
+// Note : This annotation loads the classes and creates a "fake" context.
+// We COULD use the original ServerApplication context but there is a mongo error as we disabled mongo
 @RunWith(SpringRunner.class)
 public class TransactionDALImplTest {
 

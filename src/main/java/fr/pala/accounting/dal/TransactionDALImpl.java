@@ -2,12 +2,7 @@ package fr.pala.accounting.dal;
 
 import fr.pala.accounting.model.AccountModel;
 import fr.pala.accounting.model.TransactionModel;
-import fr.pala.accounting.server.ServerApplication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
