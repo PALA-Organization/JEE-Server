@@ -37,7 +37,6 @@ jobs:
         run: docker build . --tag jee-serve:dev
 
   publish-dev-image:
-    if: github.ref == 'develop'
     needs: build-dev
     runs-on: self-hosted
     steps:
@@ -55,7 +54,6 @@ jobs:
         run: docker push alexandrebis/4al2-jee-project:lastversion-dev
 
   deploy-dev:
-    if: github.ref == 'develop'
     needs: build-dev
     runs-on: self-hosted
     steps:
@@ -77,7 +75,6 @@ jobs:
         run: docker build . --tag jee-server:prod
 
   publish-prod-image:
-    if: github.ref == 'master'
     needs: build-prod
     runs-on: self-hosted
     steps:
@@ -95,7 +92,6 @@ jobs:
         run: docker push alexandrebis/4al2-jee-project:lastversion-prod
 
   deploy-prod:
-    if: github.ref == 'master'
     needs: [build-prod, publish-prod-image]
     runs-on: self-hosted
     steps: 
