@@ -1,8 +1,5 @@
 package fr.pala.accounting.dal;
-
 import fr.pala.accounting.model.AccountModel;
-import fr.pala.accounting.model.TransactionModel;
-
 import java.util.List;
 
 

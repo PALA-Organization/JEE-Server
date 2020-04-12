@@ -2,10 +2,7 @@ package fr.pala.accounting.dal;
 
 import fr.pala.accounting.model.AccountModel;
 import fr.pala.accounting.model.UserModel;
-import fr.pala.accounting.server.ServerApplication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -23,11 +20,6 @@ public class AccountDALImpl implements AccountDAL {
 
     @Autowired
     private UserDALImpl userDALImpl;
-
-    @Autowired
-    private AccountDALImpl() {
-    }
-
 
     @Override
     public AccountModel addAccount(String user_id, AccountModel accountModel) {

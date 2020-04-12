@@ -22,10 +22,6 @@ public class TransactionDALImpl implements TransactionDAL {
     @Autowired
     private AccountDALImpl accountDALImpl;
 
-    @Autowired
-    public TransactionDALImpl(){
-
-    }
 
     @Override
     public List<TransactionModel> getAllTransactionsOfAccount(String user_id, String account_id) {
