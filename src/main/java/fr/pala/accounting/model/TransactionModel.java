@@ -18,10 +18,10 @@ public class TransactionModel {
     private String shop_name;
     private String shop_address;
     private Date date;
-    private Float amount;
+    private Double amount;
     private String description;
 
-    public TransactionModel(String transaction_id, String type, String shop_name, String shop_address, Date date, Float amount, String description){
+    public TransactionModel(String transaction_id, String type, String shop_name, String shop_address, Date date, Double amount, String description){
         this.transaction_id = transaction_id;
         this.type = type;
         this.shop_name = shop_name;

@@ -29,12 +29,14 @@ public class TransactionDALImpl implements TransactionDAL {
 
     @Override
     public List<TransactionModel> getAllTransactionsOfAccount(String user_id, String account_id) {
-
+        List<TransactionModel> transactionResults = new ArrayList<TransactionModel>();
         AccountModel accountModel = accountDALImpl.getAccountOfUser(user_id, account_id);
 
-        ArrayList<String> transactions_ids = accountModel.getTransactions_ids();
+        if(accountModel == null){
+            return transactionResults;
+        }
 
-        List<TransactionModel> transactionResults = null;
+        ArrayList<String> transactions_ids = accountModel.getTransactions_ids();
 
         for (int i = 0; i < transactions_ids.size() ; i++) {
             Query query = new Query();
