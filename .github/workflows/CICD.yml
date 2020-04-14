@@ -34,7 +34,7 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Build Docker image
-        run: docker build . --tag jee-serve:dev
+        run: docker build . --tag jee-server:dev
 
   publish-dev-image:
     needs: build-dev
@@ -48,10 +48,10 @@ jobs:
           docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
 
       - name: Tag of the new image
-        run: docker tag jee-server:dev alexandrebis/4al2-jee-project:lastversion-dev
+        run: docker tag jee-server:dev alexandrebis/4al2-jee-project:dev
 
       - name: Push of the new image
-        run: docker push alexandrebis/4al2-jee-project:lastversion-dev
+        run: docker push alexandrebis/4al2-jee-project:dev
 
   deploy-dev:
     needs: build-dev
@@ -61,7 +61,7 @@ jobs:
         run: docker rm jee-server || echo "Server already stopped"
 
       - name: Launch new Docker image
-        run: docker run -d -p 8080:8080 --name "jee-server" jee-server
+        run: docker run -d -p 8080:8080 --name "jee-server" jee-server:dev
 
   build-prod:
     needs: test
@@ -86,10 +86,10 @@ jobs:
           docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
 
       - name: Tag of the new image
-        run: docker tag jee-server:prod alexandrebis/4al2-jee-project:lastversion-prod
+        run: docker tag jee-server:prod alexandrebis/4al2-jee-project:prod
 
       - name: Push of the new image
-        run: docker push alexandrebis/4al2-jee-project:lastversion-prod
+        run: docker push alexandrebis/4al2-jee-project:prod
 
   deploy-prod:
     needs: [build-prod, publish-prod-image]
