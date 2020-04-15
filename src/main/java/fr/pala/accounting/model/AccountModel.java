@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 
-@Document
+@Document(collection = "Account")
 @Getter
 @Setter
 public class AccountModel {

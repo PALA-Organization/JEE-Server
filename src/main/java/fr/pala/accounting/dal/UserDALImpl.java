@@ -16,10 +16,8 @@ public class UserDALImpl implements UserDAL {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-
     @Autowired
     public UserDALImpl(){
-
     }
 
     @Override
