@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.Date;
 
-@Document
+@Document(collection = "User")
 @Getter
 @Setter
 public class UserModel {
