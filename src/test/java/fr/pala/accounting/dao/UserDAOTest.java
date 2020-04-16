@@ -65,7 +65,4 @@ public class UserDAOTest {
 
         assertThat(userDAO.getUserById(user_id).getName()).isEqualTo("Test");
     }
-
-
-
 }

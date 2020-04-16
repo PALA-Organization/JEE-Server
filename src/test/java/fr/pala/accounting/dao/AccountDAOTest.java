@@ -30,36 +30,31 @@ public class AccountDAOTest {
     public void addAccountTest(){
         //parameters of addAccount
         String user_id = "234";
-        AccountModel account = new AccountModel("34234234", 23.30, new ArrayList<>());
+        AccountModel account = new AccountModel(null, 23.30, new ArrayList<>());
 
-        //mock un user
-        ArrayList<AccountModel> accounts = new ArrayList<>();
+        //mock of the user get
         Query query = new Query();
         query.addCriteria(Criteria.where("user_id").is(user_id));
         Mockito.when(mongoTemplate.findOne(query, UserModel.class))
-                .then(ignoredInvocation -> new UserModel("32352453234", "Test", "test@test.fr", new Date(), new Date(), accounts));
+                .then(ignoredInvocation -> new UserModel("234", "Test", "test@test.fr", new Date(), new Date(), new ArrayList<AccountModel>()));
 
+        //mock of the account save
         AccountModel accountResult = new AccountModel("34234234", 23.30, new ArrayList<>());
         Mockito.when(mongoTemplate.save(Mockito.any(AccountModel.class))).thenReturn(accountResult);
 
-        assertThat(accountDAO.addAccount(user_id, account).getAccount_id()).isEqualTo("34234234");
+        assertThat(accountDAO.addAccount(user_id, account).getAmount()).isEqualTo(23.30);
     }
 
     @Test
     public void getAllAccountsOfUsersTest() {
-        //user_id
-        //String user_id, String account_id
+        //parameter of getAllAccountsOfUsers
         String user_id = "12";
 
+        //Mock two accounts
+        AccountModel account = new AccountModel("", 234.55, new ArrayList<String>());
+        AccountModel account2 = new AccountModel("", 234.55,  new ArrayList<String>());
 
-        //Mock a account
-        ArrayList<String> transactionsIds = new ArrayList<String>();
-        transactionsIds.add("235");
-        transactionsIds.add("444");
-        AccountModel account = new AccountModel("", 234.55, transactionsIds);
-        AccountModel account2 = new AccountModel("", 234.55, transactionsIds);
-
-        //mock the user
+        //mock the user get
         ArrayList<AccountModel> accounts = new ArrayList<>();
         accounts.add(account);
         accounts.add(account2);
@@ -73,27 +68,23 @@ public class AccountDAOTest {
 
     @Test
     public void getAccountOfUserTest() {
-        //String user_id, String account_id
+        //Parameters of getAccountOfUser
         String user_id = "12";
-
         String account_id = "13";
 
-        //Mock a account
-        ArrayList<String> transactionsIds = new ArrayList<String>();
-        transactionsIds.add("235");
-        transactionsIds.add("444");
-        AccountModel account = new AccountModel(account_id, 234.55, transactionsIds);
-        Query query1 = new Query();
-        query1.addCriteria(Criteria.where("account_id").is(account_id));
-        Mockito.when(mongoTemplate.findOne(query1, AccountModel.class))
+        //Mock an account get
+        AccountModel account = new AccountModel(account_id, 234.55, new ArrayList<String>());
+        Query query = new Query();
+        query.addCriteria(Criteria.where("account_id").is(account_id));
+        Mockito.when(mongoTemplate.findOne(query, AccountModel.class))
                 .then(ignoredInvocation -> account);
 
         //mock the user
         ArrayList<AccountModel> accounts = new ArrayList<>();
         accounts.add(account);
-        Query query = new Query();
-        query.addCriteria(Criteria.where("user_id").is(user_id));
-        Mockito.when(mongoTemplate.findOne(query, UserModel.class))
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("user_id").is(user_id));
+        Mockito.when(mongoTemplate.findOne(query1, UserModel.class))
                 .then(ignoredInvocation -> new UserModel("32352453234", "Test", "test@test.fr", new Date(), new Date(), accounts));
 
         assertThat(accountDAO.getAccountOfUser(user_id, account_id).getAccount_id()).isEqualTo(account_id);
@@ -101,21 +92,18 @@ public class AccountDAOTest {
 
     @Test
     public void getAmountOfAccountTest() {
+        //Parameters of getAmountOfAccount
         String user_id = "12";
-
         String account_id = "13";
 
-        //Mock a account
-        ArrayList<String> transactionsIds = new ArrayList<String>();
-        transactionsIds.add("235");
-        transactionsIds.add("444");
-        AccountModel account = new AccountModel(account_id, 234.55, transactionsIds);
+        //Mock an account get
+        AccountModel account = new AccountModel(account_id, 234.55, new ArrayList<String>());
         Query query1 = new Query();
         query1.addCriteria(Criteria.where("account_id").is(account_id));
         Mockito.when(mongoTemplate.findOne(query1, AccountModel.class))
                 .then(ignoredInvocation -> account);
 
-        //mock the user
+        //mock the user get
         ArrayList<AccountModel> accounts = new ArrayList<>();
         accounts.add(account);
         Query query = new Query();
@@ -125,5 +113,4 @@ public class AccountDAOTest {
 
         assertThat(accountDAO.getAmountOfAccount(user_id, account_id)).isEqualTo(234.55);
     }
-
 }

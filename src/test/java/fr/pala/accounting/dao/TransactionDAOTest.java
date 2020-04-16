@@ -33,12 +33,12 @@ public class TransactionDAOTest {
 
     @Test
     public void getAllTransactionsOfNoAccountTest() {
-
+        //Parameters of getAllTransactionsOfAccount
         String user_id = "32352453234";
         String account_id = "12";
 
+        //Mock the user get
         ArrayList<AccountModel> accounts = new ArrayList<>();
-
         Query query = new Query();
         query.addCriteria(Criteria.where("user_id").is(user_id));
         Mockito.when(mongoTemplate.findOne(query, UserModel.class))
@@ -49,10 +49,11 @@ public class TransactionDAOTest {
 
     @Test
     public void getAllTransactionsOfAccountTest() {
-
+        //Parameters of getAllTransactionsOfAccount
         String user_id = "32352453234";
         String account_id = "12";
 
+        //Mock the user get
         ArrayList<AccountModel> accounts = new ArrayList<>();
         ArrayList<String> transactionsIds = new ArrayList<String>();
         transactionsIds.add("235");
@@ -70,6 +71,7 @@ public class TransactionDAOTest {
 
     @Test
     public void getTransactionTest(){
+        //parameters of getTransaction
         String transactionId = "223435345345";
 
         TransactionModel transaction = new TransactionModel("223435345345", "Test", "Auchan",
@@ -87,14 +89,13 @@ public class TransactionDAOTest {
     @Test
     public void addTransactionTest() {
 
-        //input parameters
+        //parameters of addTransaction
         String user_id = "12";
         String account_id = "3234234";
         TransactionModel transaction = new TransactionModel("223435345345", "Test", "Auchan",
                 "Test", new Date(), 33.70, "Test");
 
-
-        //Mock a account
+        //Mock the account get
         ArrayList<String> transactionsIds = new ArrayList<String>();
         transactionsIds.add("235");
         transactionsIds.add("444");
@@ -104,15 +105,13 @@ public class TransactionDAOTest {
         Mockito.when(mongoTemplate.findOne(query1, AccountModel.class))
                 .then(ignoredInvocation -> account);
 
-        //mock the user
+        //mock the user get
         ArrayList<AccountModel> accounts = new ArrayList<>();
         accounts.add(account);
         Query query = new Query();
         query.addCriteria(Criteria.where("user_id").is(user_id));
         Mockito.when(mongoTemplate.findOne(query, UserModel.class))
                 .then(ignoredInvocation -> new UserModel("32352453234", "Test", "test@test.fr", new Date(), new Date(), accounts));
-
-
 
         Mockito.when(mongoTemplate.save(Mockito.any(TransactionModel.class))).thenReturn(transaction);
 
