@@ -1,4 +1,4 @@
-package fr.pala.accounting.dal;
+package fr.pala.accounting.dao;
 
 import fr.pala.accounting.model.AccountModel;
 import fr.pala.accounting.model.TransactionModel;
@@ -13,20 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class TransactionDALImpl implements TransactionDAL {
-
+public class TransactionDAO {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private AccountDALImpl accountDALImpl;
+    private AccountDAO accountDAO;
 
-
-    @Override
     public List<TransactionModel> getAllTransactionsOfAccount(String user_id, String account_id) {
         List<TransactionModel> transactionResults = new ArrayList<TransactionModel>();
-        AccountModel accountModel = accountDALImpl.getAccountOfUser(user_id, account_id);
+        AccountModel accountModel = accountDAO.getAccountOfUser(user_id, account_id);
 
         if(accountModel == null){
             return transactionResults;
@@ -34,39 +31,34 @@ public class TransactionDALImpl implements TransactionDAL {
 
         ArrayList<String> transactions_ids = accountModel.getTransactions_ids();
 
-        for (int i = 0; i < transactions_ids.size() ; i++) {
+        for (String transactions_id : transactions_ids) {
             Query query = new Query();
-            query.addCriteria(Criteria.where("transaction_id").is(transactions_ids.get(i)));
+            query.addCriteria(Criteria.where("transaction_id").is(transactions_id));
             transactionResults.add(mongoTemplate.findOne(query, TransactionModel.class));
         }
 
         return transactionResults;
     }
 
-    @Override
     public TransactionModel getTransaction(String transaction_id) {
         Query query = new Query();
         query.addCriteria(Criteria.where("transaction_id").is(transaction_id));
         return mongoTemplate.findOne(query, TransactionModel.class);
     }
 
-    @Override
     public TransactionModel addTransaction(String user_id, String account_id, TransactionModel transactionModel) {
         TransactionModel transactionResult = mongoTemplate.save(transactionModel);
 
-        AccountModel account = accountDALImpl.getAccountOfUser(user_id, account_id);
+        //add transaction to account
+        AccountModel account = accountDAO.getAccountOfUser(user_id, account_id);
         ArrayList<String> transactions_ids = account.getTransactions_ids();
         transactions_ids.add(transactionResult.getTransaction_id());
         account.setTransactions_ids(transactions_ids);
-
-
-        accountDALImpl.updateAccount(user_id, account_id, account);
-
+        accountDAO.updateAccount(user_id, account_id, account);
         return transactionResult;
     }
 
-    @Override
-    public void updateTransaction(String user_id, String account_id, TransactionModel transactionModel) {
+    public void updateTransaction(TransactionModel transactionModel) {
         Query query = new Query();
         query.addCriteria(Criteria.where("transaction_id").is(transactionModel.getTransaction_id()));
         Update update = new Update();
@@ -78,27 +70,22 @@ public class TransactionDALImpl implements TransactionDAL {
         update.set("description", transactionModel.getDescription());
 
         mongoTemplate.findAndModify(query, update, TransactionModel.class);
-
     }
 
-    @Override
     public void deleteTransaction(String user_id, String account_id, TransactionModel transaction) {
 
         mongoTemplate.remove(transaction);
 
-        AccountModel account = accountDALImpl.getAccountOfUser(user_id, account_id);
+        AccountModel account = accountDAO.getAccountOfUser(user_id, account_id);
         ArrayList<String> transactions_ids = account.getTransactions_ids();
 
         for (int i = 0; i < transactions_ids.size(); i++) {
-            if(transactions_ids.get(i) == transaction.getTransaction_id()){
+            if(transactions_ids.get(i).equals(transaction.getTransaction_id())){
                 transactions_ids.remove(i);
+                break;
             }
         }
         account.setTransactions_ids(transactions_ids);
-
-
-        accountDALImpl.updateAccount(user_id, account_id, account);
-
-
+        accountDAO.updateAccount(user_id, account_id, account);
     }
 }

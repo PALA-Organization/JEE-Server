@@ -1,8 +1,9 @@
-package fr.pala.accounting.dal;
+package fr.pala.accounting.dao;
 
 import fr.pala.accounting.model.AccountModel;
 import fr.pala.accounting.model.UserModel;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +20,15 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = UserDALImpl.class)
+@SpringBootTest(classes = UserDAO.class)
 @RunWith(SpringRunner.class)
-public class UserDALImplTest {
+public class UserDAOTest {
 
     @MockBean
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private UserDALImpl userDALImpl;
+    private UserDAO userDAO;
 
     @Test
     public void addUserTest() {
@@ -38,7 +39,7 @@ public class UserDALImplTest {
 
         Mockito.when(mongoTemplate.save(Mockito.any(UserModel.class))).thenReturn(userResult);
 
-        assertThat(userDALImpl.addUser(user).getUser_id()).isEqualTo("23424524523412");
+        assertThat(userDAO.addUser(user).getUser_id()).isEqualTo("23424524523412");
     }
 
     @Test
@@ -49,7 +50,7 @@ public class UserDALImplTest {
                 .then(ignoredInvocation -> Arrays.asList(new UserModel("", "Test", "test@test.fr", new Date(), new Date(), accounts),
                         new UserModel("", "Test", "test@test.fr", new Date(), new Date(), accounts)));
 
-        assertThat(userDALImpl.getAllUsers()).hasSize(2);
+        assertThat(userDAO.getAllUsers()).hasSize(2);
     }
 
     @Test
@@ -62,7 +63,7 @@ public class UserDALImplTest {
         Mockito.when(mongoTemplate.findOne(query, UserModel.class))
                 .then(ignoredInvocation -> new UserModel("34234234234", "Test", "test@test.fr", new Date(), new Date(), accounts));
 
-        assertThat(userDALImpl.getUserById(user_id).getName()).isEqualTo("Test");
+        assertThat(userDAO.getUserById(user_id).getName()).isEqualTo("Test");
     }
 
 

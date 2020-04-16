@@ -22,5 +22,4 @@ public class AccountModel {
         this.amount = amount;
         this.transactions_ids = transactions_ids;
     }
-
 }
