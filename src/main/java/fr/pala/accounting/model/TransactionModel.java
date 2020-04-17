@@ -29,7 +29,5 @@ public class TransactionModel {
         this.date = date;
         this.amount = amount;
         this.description = description;
-
     }
-
 }

@@ -1,4 +1,4 @@
-package fr.pala.accounting.dal;
+package fr.pala.accounting.dao;
 
 import fr.pala.accounting.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,33 +11,29 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class UserDALImpl implements UserDAL {
+public class UserDAO {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    public UserDALImpl(){
+    public UserDAO(){
     }
 
-    @Override
     public UserModel addUser(UserModel user) {
         return mongoTemplate.save(user);
     }
 
-    @Override
     public List<UserModel> getAllUsers() {
         return mongoTemplate.findAll(UserModel.class);
     }
 
-    @Override
     public UserModel getUserById(String user_id) {
         Query query = new Query();
         query.addCriteria(Criteria.where("user_id").is(user_id));
         return mongoTemplate.findOne(query, UserModel.class);
     }
 
-    @Override
     public void updateUser(UserModel user) {
         Query query = new Query();
         query.addCriteria(Criteria.where("user_id").is(user.getUser_id()));
@@ -45,8 +41,6 @@ public class UserDALImpl implements UserDAL {
         update.set("name", user.getName());
         update.set("email", user.getEmail());
         update.set("last_connection", user.getLast_connection());
-
-
         mongoTemplate.findAndModify(query, update, UserModel.class);
     }
 }
