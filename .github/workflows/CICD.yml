@@ -58,7 +58,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Stop previous Docker image
-        run: docker rm jee-server || echo "Server already stopped"
+        run:  (docker stop jee-server || echo "Container already stopped") && (docker rm jee-server || echo "Image already removed")
 
       - name: Launch new Docker image
         run: docker run -d -p 8080:8080 --name "jee-server" jee-server:dev
