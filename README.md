@@ -22,7 +22,7 @@ $ docker build . --tag jee-server
 $ docker run -d -p 8080:8080 --name="jee-server" jee-server
 ```
 
-##Configurer ses variables d'environnements sur IntelliJ
+## Configurer ses variables d'environnements sur IntelliJ
 - Ouvrir la fenêtre 'Edit Run/Debug Configuration'.
 - Se rendre dans la configuration du launcher Spring boot.
 - Dans l'onglet 'Configuration' ajouter les variables d'environnements suivantes
