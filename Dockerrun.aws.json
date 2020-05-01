@@ -1,0 +1,11 @@
+{
+	"AWSEBDockerrunVersion": "1",
+	"Image": {
+		"Name": "alexandrebis/4al2-jee-project:lastversion-dev"
+	},
+	"Ports": [
+		{
+			"ContainerPort": "8080"
+		}
+	]
+}

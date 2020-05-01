@@ -1,4 +1,4 @@
-package fr.pala.compta.server;
+package fr.pala.accounting;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

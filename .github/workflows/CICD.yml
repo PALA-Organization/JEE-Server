@@ -1,42 +1,99 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# Workflow of JEE-Server
 
 name: CI/CD
 
 on:
   push:
     paths-ignore:
-    - '.github/**'
+      - '.github/**'
   pull_request:
     paths-ignore:
-    - '.github/**'
+      - '.github/**'
 
 jobs:
   test:
     runs-on: self-hosted
     steps:
-    - name: Checkout repository access
-      uses: actions/checkout@v2 # Check if the workflow can access our repo
-    
-    - name: Set up Java 11 environment
-      uses: actions/setup-java@v1 # Sets up a Java environment
-      with:
-        java-version: 11
-       
-    - name: Test with Maven
-      run: mvn test
+      - name: Checkout repository access
+        uses: actions/checkout@v2 # Check if the workflow can access our repo
 
-  build:
+      - name: Set up Java 11 environment
+        uses: actions/setup-java@v1 # Sets up a Java environment
+        with:
+          java-version: 11
+
+      - name: Test with Maven
+        run: mvn test
+
+  build-dev:
     needs: test
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: self-hosted
     steps:
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-     
-  deploy:
-    if: github.ref == 'master' && github.event_name == 'push'
-    needs: build
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Build Docker image
+        run: docker build . --tag jee-server:dev
+
+  publish-dev-image:
+    needs: build-dev
     runs-on: self-hosted
     steps:
-    - name: Deploy with Maven
-      run: nohup mvn spring-boot:run &
+      - name: Log-in on Docker repository
+        env:
+          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
+          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}  
+        run: |
+          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
+
+      - name: Tag of the new image
+        run: docker tag jee-server:dev alexandrebis/4al2-jee-project:dev
+
+      - name: Push of the new image
+        run: docker push alexandrebis/4al2-jee-project:dev
+
+  deploy-dev:
+    needs: build-dev
+    runs-on: self-hosted
+    steps:
+      - name: Stop previous Docker image
+        run:  (docker stop jee-server || echo "Container already stopped") && (docker rm jee-server || echo "Image already removed")
+
+      - name: Launch new Docker image
+        run: docker run -d -p 8080:8080 --name "jee-server" jee-server:dev
+
+  build-prod:
+    needs: test
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: self-hosted
+    steps:
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Build Docker image
+        run: docker build . --tag jee-server:prod
+
+  publish-prod-image:
+    needs: build-prod
+    runs-on: self-hosted
+    steps:
+      - name: Log-in on Docker repository
+        env:
+          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
+          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}
+        run: |
+          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
+
+      - name: Tag of the new image
+        run: docker tag jee-server:prod alexandrebis/4al2-jee-project:prod
+
+      - name: Push of the new image
+        run: docker push alexandrebis/4al2-jee-project:prod
+
+  deploy-prod:
+    needs: [build-prod, publish-prod-image]
+    runs-on: self-hosted
+    steps: 
+      - name: TODO
+        run: echo "TODO Deploy the image to Beanstalk"
