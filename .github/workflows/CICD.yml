@@ -30,28 +30,8 @@ jobs:
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: self-hosted
     steps:
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
       - name: Build Docker image
         run: docker build . --tag jee-server:dev
-
-  publish-dev-image:
-    needs: build-dev
-    runs-on: self-hosted
-    steps:
-      - name: Log-in on Docker repository
-        env:
-          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
-          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}  
-        run: |
-          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
-
-      - name: Tag of the new image
-        run: docker tag jee-server:dev alexandrebis/4al2-jee-project:dev
-
-      - name: Push of the new image
-        run: docker push alexandrebis/4al2-jee-project:dev
 
   deploy-dev:
     needs: build-dev
@@ -76,58 +56,25 @@ jobs:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: self-hosted
     steps:
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
       - name: Build Docker image
         run: docker build . --tag jee-server:prod
 
-  publish-prod-image:
+  deploy-prod:
     needs: build-prod
     runs-on: self-hosted
-    steps:
-      - name: Log-in on Docker repository
-        env:
-          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
-          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}
-        run: |
-          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
-
-      - name: Tag of the new image
-        run: docker tag jee-server:prod alexandrebis/4al2-jee-project:prod
-
-      - name: Push of the new image
-        run: docker push alexandrebis/4al2-jee-project:prod
-
-  deploy-prod:
-    needs: [build-prod, publish-prod-image]
-    runs-on: self-hosted
     steps: 
-      - name: TODO
-        run: echo "TODO Deploy the image to Beanstalk"
+      - name: Initliaze AWS env
+        run: eb use JeeServerBase-env
         
-      - name: Initialize env vars
+      - name: Set env vars
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_DEFAULT_REGION: "us-east-1" 
           AUTHENTIFICATION_DATABASE: ${{ secrets.PROD_MONGO_AUTHENTIFICATION_DATABASE }}
           DB_USERNAME: ${{ secrets.PROD_MONGO_USERNAME }}
           DB_PASSWORD: ${{ secrets.PROD_MONGO_PASSWORD }}
           DB_NAME: ${{ secrets.PROD_MONGO_DATABASE }}
           DB_PORT: ${{ secrets.PROD_MONGO_PORT }}
           DB_HOST: ${{ secrets.PROD_MONGO_HOST }}
-        uses: hmanzur/actions-aws-eb@v1.0.0
-        with:
-          command: 'setenv AUTHENTIFICATION_DATABASE=AUTHENTIFICATION_DATABASE && setenv DB_USERNAME=DB_USERNAME && setenv DB_PASSWORD=DB_PASSWORD && setenv DB_NAME=DB_NAME && setenv DB_PORT=DB_PORT && setenv DB_HOST=DB_HOST'
+        run: eb setenv AUTHENTIFICATION_DATABASE=$AUTHENTIFICATION_DATABASE DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD DB_NAME=$DB_NAME DB_PORT=$DB_PORT DB_HOST=$DB_HOST
         
       - name: Deploy on EB
-        uses: hmanzur/actions-aws-eb@v1.0.0
-        with:
-          command: 'deploy ${{ secrets.AWS_ENVIRONMENT_NAME }}'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_DEFAULT_REGION: "us-east-1"
+        run: eb deploy ${{ secrets.AWS_ENVIRONMENT_NAME }}
