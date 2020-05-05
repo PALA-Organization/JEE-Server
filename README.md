@@ -22,7 +22,7 @@ $ docker build . --tag jee-server
 $ docker run -d -p 8080:8080 --name="jee-server" jee-server
 ```
 
-## Configurer ses variables d'environnements sur IntelliJ
+### Configurer ses variables d'environnements sur IntelliJ
 - Ouvrir la fenêtre 'Edit Run/Debug Configuration'.
 - Se rendre dans la configuration du launcher Spring boot.
 - Dans l'onglet 'Configuration' ajouter les variables d'environnements suivantes
@@ -73,3 +73,6 @@ Scan des tickets de caisse pour ne pas avoir à rentrer à la main
 
 ## Working flow
 [Git flow](https://danielkummer.github.io/git-flow-cheatsheet/index.fr_FR.html)
+
+## Documentation CI/CD
+https://gitlab.com/4al2-jee/documentation/-/wikis/CI/CICD-avec-Github-Action
