@@ -28,12 +28,12 @@ $ docker run -d -p 8080:8080 --name="jee-server" jee-server
 - Dans l'onglet 'Configuration' ajouter les variables d'environnements suivantes
 
 ```
-AUTHENTIFICATION_DATABASE=
-DB_USERNAME=
-DB_PASSWORD=
-DB_NAME=
-DB_PORT=
-DB_HOST=
+AUTHENTIFICATION_DATABASE=admin
+DB_USERNAME=root
+DB_PASSWORD=c---------------s
+DB_NAME=jee-server
+DB_PORT=27010
+DB_HOST=51.178.18.199
 ```
 
 ## Description
