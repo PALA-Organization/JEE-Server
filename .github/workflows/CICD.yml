@@ -46,7 +46,6 @@ jobs:
           DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}  
         run: |
           docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
-
       - name: Tag of the new image
         run: docker tag jee-server:dev alexandrebis/4al2-jee-project:dev
 
@@ -61,39 +60,32 @@ jobs:
         run:  (docker stop jee-server || echo "Container already stopped") && (docker rm jee-server || echo "Image already removed")
 
       - name: Launch new Docker image
-        run: docker run -d -p 8080:8080 --name "jee-server" jee-server:dev
-
-  build-prod:
-    needs: test
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    runs-on: self-hosted
-    steps:
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      - name: Build Docker image
-        run: docker build . --tag jee-server:prod
-
-  publish-prod-image:
-    needs: build-prod
-    runs-on: self-hosted
-    steps:
-      - name: Log-in on Docker repository
         env:
-          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
-          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}
+          AUTHENTIFICATION_DATABASE: ${{ secrets.DEV_MONGO_AUTHENTIFICATION_DATABASE }}
+          DB_USERNAME: ${{ secrets.DEV_MONGO_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DEV_MONGO_PASSWORD }}
+          DB_NAME: ${{ secrets.DEV_MONGO_DATABASE }}
+          DB_PORT: ${{ secrets.DEV_MONGO_PORT }}
+          DB_HOST: ${{ secrets.DEV_MONGO_HOST }}
         run: |
-          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
-
-      - name: Tag of the new image
-        run: docker tag jee-server:prod alexandrebis/4al2-jee-project:prod
-
-      - name: Push of the new image
-        run: docker push alexandrebis/4al2-jee-project:prod
-
+          docker run -d -p 8080:8080 -e AUTHENTIFICATION_DATABASE -e DB_USERNAME -e DB_PASSWORD -e DB_NAME -e DB_PORT -e DB_HOST --name "jee-server" jee-server:dev
+        
   deploy-prod:
-    needs: [build-prod, publish-prod-image]
+    needs: test
     runs-on: self-hosted
     steps: 
-      - name: TODO
-        run: echo "TODO Deploy the image to Beanstalk"
+      - name: Initliaze AWS env
+        run: eb use JeeServerBase-env
+        
+      - name: Set env vars
+        env:
+          AUTHENTIFICATION_DATABASE: ${{ secrets.PROD_MONGO_AUTHENTIFICATION_DATABASE }}
+          DB_USERNAME: ${{ secrets.PROD_MONGO_USERNAME }}
+          DB_PASSWORD: ${{ secrets.PROD_MONGO_PASSWORD }}
+          DB_NAME: ${{ secrets.PROD_MONGO_DATABASE }}
+          DB_PORT: ${{ secrets.PROD_MONGO_PORT }}
+          DB_HOST: ${{ secrets.PROD_MONGO_HOST }}
+        run: eb setenv AUTHENTIFICATION_DATABASE=$AUTHENTIFICATION_DATABASE DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD DB_NAME=$DB_NAME DB_PORT=$DB_PORT DB_HOST=$DB_HOST
+        
+      - name: Deploy on EB
+        run: eb deploy ${{ secrets.AWS_ENVIRONMENT_NAME }}
