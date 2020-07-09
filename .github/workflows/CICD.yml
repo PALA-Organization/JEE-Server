@@ -30,8 +30,27 @@ jobs:
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: self-hosted
     steps:
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
       - name: Build Docker image
         run: docker build . --tag jee-server:dev
+
+  publish-dev-image:
+    needs: build-dev
+    runs-on: self-hosted
+    steps:
+      - name: Log-in on Docker repository
+        env:
+          DOCKERIO_USERNAME: ${{ secrets.DOCKERIO_USERNAME }}
+          DOCKERIO_PASSWORD: ${{ secrets.DOCKERIO_PASSWORD }}  
+        run: |
+          docker login -u "$DOCKERIO_USERNAME" -p "$DOCKERIO_PASSWORD"
+      - name: Tag of the new image
+        run: docker tag jee-server:dev alexandrebis/4al2-jee-project:dev
+
+      - name: Push of the new image
+        run: docker push alexandrebis/4al2-jee-project:dev
 
   deploy-dev:
     needs: build-dev
@@ -50,17 +69,9 @@ jobs:
           DB_HOST: ${{ secrets.DEV_MONGO_HOST }}
         run: |
           docker run -d -p 8080:8080 -e AUTHENTIFICATION_DATABASE -e DB_USERNAME -e DB_PASSWORD -e DB_NAME -e DB_PORT -e DB_HOST --name "jee-server" jee-server:dev
-
-  build-prod:
-    needs: test
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    runs-on: self-hosted
-    steps:
-      - name: Build Docker image
-        run: docker build . --tag jee-server:prod
-
+        
   deploy-prod:
-    needs: build-prod
+    needs: test
     runs-on: self-hosted
     steps: 
       - name: Initliaze AWS env
